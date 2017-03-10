@@ -1,0 +1,172 @@
+var port = 8081;
+// var port = process.env.port || 1337;
+
+var http = require('http');
+var fs = require("fs");
+var async = require('async');
+
+function sleep(milliSeconds) {
+	var startTime = new Date().getTime();
+	while (new Date().getTime() < startTime + milliSeconds);
+}
+
+function proc_cpu(callback)
+{
+	// 10초간 기다려! 
+	sleep(10000); 
+
+	console.log("------------------------------\n");
+
+	var data = fs.readFileSync('/proc/cpuinfo');
+	var rtn;
+
+	var cpuinfo = null;
+	var cpucnt = 0;
+	var cols = data.toString().split("\n");
+	for( var cpos=0; cpos< cols.length; cpos++ ) {
+		// console.log("col["+cpos+"]");
+		
+		if( cols[cpos].includes("model name") ) {
+			var str = cols[cpos];
+			var pos = str.search(":");
+			if( pos > 0 ) {
+				if( cpuinfo == null )
+					cpuinfo = str.substr(pos + 1).trim();
+				cpucnt++;
+			}
+		}
+	}
+
+	if( cpuinfo )
+	{
+		var obj_cpu = { "cpu" : { "model" : "", "count" : 0}, };
+		obj_cpu.cpu.model = cpuinfo.toString();
+		obj_cpu.cpu.count = cpucnt.toString();
+
+		console.log("cpu=" + JSON.stringify(obj_cpu) + "\n");
+		rtn = obj_cpu;
+	}
+	else
+	{
+		console.log("Unknown CPU\n");
+	}
+
+	console.log("------------------------------\n");
+	
+	callback(null, rtn);
+}
+
+function proc_mem(callback)
+{
+	console.log("------------------------------\n");
+	var obj_mem = { "total" : 0, "free" : 0, "available" : 0, "swap" : 0 };
+
+	console.log("mem=" + JSON.stringify(obj_mem) + "\n");
+	console.log("------------------------------\n");
+	callback(null, obj_mem);
+}
+function proc_sysvipc(callback)
+{
+	console.log("------------------------------\n");
+	var obj_ipc = {
+		"msg" : [{
+			"key" : 0,
+			"msqid" : 0,
+			"perms" : 0,
+			"cbytes": 0,
+			"qnum" : 0,
+			"lspid" : 0,
+			"lrpid" : 0,
+			"stime" : 0,
+			"rtime" : 0,
+			"ctime" : 0,
+		},],
+		"sem" : [{
+			"key" : 0,
+			"semid": 0,
+			"perms": 0,
+			"nsems": 0,
+		},],
+		"shm" : [{
+			"key" : 0,
+			"shmid" : 0,
+			"perms" : 0,
+			"size" : 0,
+			"nattch" : 0,
+			"uid" : 0,
+			"gid" : 0,
+			"cuid" : 0,
+			"cgid" : 0,
+			"atime": 0,
+			"dtime": 0,
+			"ctime": 0,
+		},],
+    };
+	
+	console.log("sysvipc=" + JSON.stringify(obj_ipc) + "\n");
+	console.log("------------------------------\n");
+	callback(null, obj_ipc);
+}
+
+function proc_net(callback)
+{
+	console.log("------------------------------\n");
+	var obj_net = {
+		"tcp" : [{
+			"local_address" : "",
+			"rem_address" : "",
+			"st" : "",
+			"tx_queue" : 0,
+			"rx_queue" : 0,
+		},],
+		"udp" : [{
+			"local_address" : "",
+			"rem_address" : "",
+			"st" : "",
+			"tx_queue" : 0,
+			"rx_queue" : 0,
+		},],
+	};
+
+	console.log("net=" + JSON.stringify(obj_net) + "\n");
+	console.log("------------------------------\n");
+	callback(null, obj_net);
+}
+
+function server_accepted(req, res)
+{
+	console.log("Accepted...");
+
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.write('Hello World\n');
+
+    var obj_sys = {
+    	"cpu" : {},
+    	"mem" : {},
+    	"sysvipc" : {},
+		"net" : {},
+    };
+	var procs = [proc_cpu, proc_mem, proc_sysvipc, proc_net];
+
+	var dt_s = new Date().getTime();
+
+	async.parallel(procs, 
+		function(err, results) {
+
+			var rtn = JSON.stringify(results);
+			res.write(rtn);
+
+			console.log("#########################################\n");
+			console.log("async" + rtn);
+			console.log("#########################################\n");
+		}
+	);
+
+	console.log('elapsed time : '+(new Date().getTime() - dt_s));
+    
+    res.end();
+}
+
+var server_main = http.createServer(server_accepted);
+server_main.listen(port);
+console.log("Server running at http://127.0.0.1:8081");
