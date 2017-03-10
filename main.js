@@ -82,7 +82,7 @@ function server_accepted(req, res)
     // res.writeHead(200, { 'Content-Type': 'application/json' });
     // res.write('Hello World\n');
 
-	var procs = [sysm.cpu, sysm.mem, proc_sysvipc, proc_net];
+	var procs = [sysm.cpu, sysm.mem, proc_sysvipc, sysm.net];
 
 	var dt_s = new Date().getTime();
 
