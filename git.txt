@@ -1,0 +1,19 @@
+# make .git folder
+git init
+
+# user
+git config --local user.email "lclasser@gmail.com"
+git config --local user.name "lclasser"
+
+git add .
+
+git commit -m "initialize..."
+
+
+git remote add origin https://github.com/lclasser/nodesysm
+
+git push origin master
+# git push origin +master
+
+git pull origin master
+
