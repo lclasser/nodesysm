@@ -9,18 +9,18 @@
 
     <script src="https://kendo.cdn.telerik.com/2017.1.118/js/jquery.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2017.1.118/js/kendo.all.min.js"></script>
-</head>
 
-<script>
-	$(document).ready(function(){
-		$.getJSON("http://192.168.0.11:8081/?type=cpu",function(result) {
-			$.each(result, function(key, field) {
-				var name = "#" + key;
-				$(name).prepend(field);
-		    });
+	<script>
+		$(document).ready(function(){
+			$.getJSON("http://192.168.73.11:8081/?type=cpu",function(result) {
+				$.each(result, function(key, field) {
+					var name = "#" + key;
+					$(name).prepend(field);
+			    });
+			});
 		});
-	});
-</script>
+	</script>
+</head>
 
 <body>
 
@@ -31,8 +31,8 @@
 		<div class="k-grid-header-wrap k-auto-scrollable">
 			<table role="grid">
 				<colgroup>
-					<col style="width:100px"> </col>
-					<col style="width:350px"> </col>
+					<col style="width:100px"/>
+					<col style="width:350px"/>
 				</colgroup>
 
 				<thead role="rowgroup">
@@ -48,8 +48,8 @@
 	<div class="k-grid-content k-auto-scrollable" style="height: 100%;">
 		<table role="grid" style="height: auto;">
 			<colgroup>
-				<col style="width:100px"></col>
-				<col style="width:350px"></col>
+				<col style="width:100px"/>
+				<col style="width:350px"/>
 			</colgroup>
 
 			<tbody role="rowgroup">

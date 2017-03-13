@@ -21,7 +21,7 @@
 			var data_tcp = new kendo.data.DataSource({
 				transport: {
 					read: {
-						url: "http://192.168.0.11:8081/?type=tcp",
+						url: "http://192.168.73.11:8081/?type=tcp",
 						dataType: "json"
 					},
 				}
