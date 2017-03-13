@@ -1,11 +1,12 @@
 var port = 8081;
 // var port = process.env.port || 1337;
 
-var http = require('http');
 var fs = require("fs");
+var http = require('http');
 var async = require('async');
+var url = require('url');
 
-var sysm = require('./proc_cpu');
+var sysm = require('./proc_sys');
 
 function dateFormat (date, fstr, utc) {
   utc = utc ? 'getUTC' : 'get';
@@ -29,95 +30,116 @@ function sleep(milliSeconds) {
 	while (new Date().getTime() < startTime + milliSeconds);
 }
 
-function proc_sysvipc(callback)
-{
-	console.log("proc_sysvipc ------------------------------>\n");
-	var obj_ipc = {
-		"ipc" : {
-			msg : [{
-				key: 0,
-				msqid : 0,
-				perms : 0,
-				cbytes: 0,
-				qnum : 0,
-				pid : 0,
-				lrpid : 0,
-				stime: 0,
-				rtime : 0,
-				ctime: 0,
-			},],
-			sem : [{
-				key : 0,
-				semid: 0,
-				perms: 0,
-				nsems: 0,
-			},],
-			shm : [{
-				key : 0,
-				shmid : 0,
-				perms : 0,
-				size : 0,
-				nattch : 0,
-				uid : 0,
-				gid : 0,
-				cuid : 0,
-				cgid : 0,
-				atime: 0,
-				dtime: 0,
-				ctime: 0,
-			},],
-		},
-    };
-	
-	console.log("sysvipc=" + JSON.stringify(obj_ipc) + "\n");
-	console.log("<------------------------------ proc_sysvipc\n");
-	callback(null, obj_ipc);
-}
-
 function server_accepted(req, res)
 {
+	console.log("####################################################################");
 	console.log("Accepted...");
 
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    // res.writeHead(200, { 'Content-Type': 'application/json' });
-    // res.write('Hello World\n');
+	var qry = url.parse(req.url, '&');
 
-	var procs = [sysm.cpu, sysm.mem, proc_sysvipc, sysm.net];
+	/////////////////////////////////////////////////////////////
+	// URL - path (routing...)
+	/////////////////////////////////////////////////////////////
+	var url_path = qry.pathname;
+	var url_item = url_path.split("/");
 
+	for( var item of url_item ) {
+		console.log("url:" + item);
+		if( item.length > 0 ) {
+			console.log("Routing...........[" + item + "]");
+
+			// res.sendFile("./view_tcp.js");
+			// res.sendFile("view_tcp.js", {root: __dirname});
+			fs.readFile(item, function(err, data) {
+				// if( err ) throw err;
+				if( err ) { console.log("view_tcp.js error..."); return; }
+				res.write(data);
+				res.end();
+				
+				console.log("Routing finish... [" + item + "]");
+			});
+			return;
+		}
+	}
+	console.log("path:" + qry.pathname);
+
+	/////////////////////////////////////////////////////////////
+	// URL - type
+	/////////////////////////////////////////////////////////////
+	var funcs = {
+		cpu : sysm.cpu,
+		mem : sysm.mem,
+		tcp : sysm.tcp,
+		udp : sysm.udp,
+	};
+	var names = [];
+	var procs = null;
+
+	var qtype = null;
+	if( qry != null ) {
+		qtype = qry.query['type'];
+
+		console.log("type[" + qtype + "]");
+		if( qtype != null ) {
+			names = [qtype,];
+			procs = [funcs[qtype]];
+		}
+	}
+
+	/////////////////////////////////////////////////////////////
+	// Type - check
+	/////////////////////////////////////////////////////////////
+	if( procs == null )
+	{
+		var tmps = [];
+		var fpos = 0;
+		for( var key in funcs ) {
+			// console.log("key:" + key);
+			// console.log("val:" + funcs[key]);
+			names[fpos] = key;
+			tmps[fpos] = funcs[key];
+
+			fpos++;
+		}
+		procs = tmps;
+	}
+
+	/////////////////////////////////////////////////////////////
+	// Processing...
+	/////////////////////////////////////////////////////////////
 	var dt_s = new Date().getTime();
-
 	async.parallel(procs, 
 		function(err, results) {
+			var nowd = new Date();
 			var sysinfo = {};
 
-			for( var opos=0; opos< results.length; opos++ ) {
-				var obj = results[opos];
-				var keys = Object.keys(obj);
+			if( qtype == null ) {
+				for( var opos=0; opos< results.length; opos++ ) {
+					var key = names[opos];
+					var rst = results[opos];
+					if( rst == null ) continue;
 
-				// console.log("obj:" + obj.toString());
-				for( var kpos=0; kpos< keys.length; kpos++ ) {
-					var kname = keys[kpos];
-
-					// console.log("keys:" + kname.toString());
-					// console.log("values:" + JSON.stringify(obj[kname]));
-
-					sysinfo[kname] = obj[kname];
+					sysinfo[key] = rst;
 				}
+
+				sysinfo["date"] = dateFormat(nowd, "%Y%m%d", false);
+				sysinfo["time"] = dateFormat(nowd, "%H%M%S", false);
+			} else {
+				sysinfo = results[0];
 			}
 
-			var nowd = new Date();
-			sysinfo["date"] = dateFormat(nowd, "%Y%m%d", false);
-			sysinfo["time"] = dateFormat(nowd, "%H%M%S", false);
-
 			var rtn = JSON.stringify(sysinfo);
-			res.write(rtn);
-		    res.end();
 
 			console.log("#########################################\n");
-			console.log("async" + rtn);
+			console.log("async:" + rtn);
 			console.log("#########################################\n");
 
 			console.log('elapsed time : '+(nowd.getTime() - dt_s));
+
+		    res.writeHead(200, { 'Content-Type': 'text/plain' });
+		    // res.writeHead(200, { 'Content-Type': 'application/json' });
+			res.write(rtn);
+		    res.end();
 		}
 	);
 }

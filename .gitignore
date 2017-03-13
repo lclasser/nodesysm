@@ -1,3 +1,5 @@
 # node.js library
 node_modules
 
+# local backup
+*.js.*

@@ -18,17 +18,17 @@
     <div id="grid"></div>
     <script>
         $(document).ready(function () {
+			var data_tcp = new kendo.data.DataSource({
+				transport: {
+					read: {
+						url: "http://192.168.0.11:8081/?type=tcp",
+						dataType: "json"
+					},
+				}
+			});
+
             $("#grid").kendoGrid({
-                dataSource: {
-                    transport: {
-                    	dataType: "json",
-                        read: {
-                        	url: "http://192.168.0.11:8081/?type=tcp",
-                        	dataType: "json"
-                        }
-                    },
-                    pageSize: 20
-                },
+                dataSource: data_tcp,
                 height: 450,
                 groupable: true,
                 sortable: true,
