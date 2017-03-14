@@ -5,134 +5,113 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8">
 
-	<link rel="stylesheet" type="text/css" href="./side_menu.css">
+	<link rel="stylesheet" type="text\css" href="./side_menu.css">
 
 	<script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-	<script src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
 
 	<script type="text/javascript">
-		$(document).ready(function () {
-			var menu_btn = $('.div_menu');
-			var menu_area = $('.menu_area');
-			var isClosed = false;
-
-		    menu_btn.click(function () {
-		      sidemenu_cross();      
-		    });
-
-    		function sidemenu_cross() {
-
-			if (isClosed == true) {
-				menu_area.hide();
-				menu_btn.removeClass('is-open');
-				menu_btn.addClass('is-closed');
-				isClosed = false;
-			} else {
-				menu_area.show();
-				menu_btn.removeClass('is-closed');
-				menu_btn.addClass('is-open');
-				isClosed = true;
-			}
+		/* Set the width of the side navigation to 250px and the left margin of the page content to 250px */
+		function openNav() {
+			document.getElementById("mySidenav").style.width = "250px";
+			document.getElementById("main").style.marginLeft = "250px";
 		}
-  	});
-//# sourceURL=pen.js
+
+		/* Set the width of the side navigation to 0 and the left margin of the page content to 0 */
+		function closeNav() {
+			document.getElementById("mySidenav").style.width = "0";
+			document.getElementById("main").style.marginLeft = "0";
+		}
 	</script>
+	<style>
 
-	<style type="text/css">
-		.div_area {
-			border: 1px solid #000000;
-			margin: 1px;
-			padding: 1px;
-		}
+/* The side navigation menu */
+.sidenav {
+	position: fixed; /* Stay in place */
+	z-index: 3; /* Stay on top */
+	height: 100%; /* 100% Full-height */
+	width: 0; /* 0 width - change this with JavaScript */
+	top: 0;
+	left: 0;
+	background-color: #FF00FF /* #111; */ /* Black*/
+	overflow-x: hidden; /* Disable horizontal scroll */
+	padding-top: 60px; /* Place content 60px from the top */
+	transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
 
-		/*-------------------------------*/
-		/*       Menu                    */
-		/*-------------------------------*/
-		.menu_area {
-		  position: fixed;
-		  display: none;
-		  width: 100%;
-		  height: 100%;
-		  top: 0;
-		  left: 0;
-		  right: 0;
-		  bottom: 0;
-		  background-color: rgba(0, 0, 0, 0.4);
-		  z-index: 1;
-		}
+/* The navigation menu links */
+.sidenav a {
+	padding: 8px 8px 8px 32px;
+	text-decoration: none;
+	font-size: 25px;
+	color: #818181;
+	display: block;
+	transition: 0.3s
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover, .offcanvas a:focus{
+	color: #f1f1f1;
+}
+
+/* Position and style the close button (top right corner) */
+.sidenav .closebtn {
+	position: absolute;
+	top: 0;
+	right: 25px;
+	font-size: 36px;
+	margin-left: 50px;
+}
+
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#main {
+	transition: margin-left .5s;
+	padding: 20px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+	.sidenav {padding-top: 15px;}
+	.sidenav a {font-size: 18px;}
+}
+
+
+.closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px !important;
+    margin-left: 50px;
+}
+
 	</style>
 </head>
 
 <body>
-    <div id="div_menu" class="menu_area">
 
-        <!-- Sidebar -->
-        <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
-            <ul class="nav sidebar-nav">
-                <li class="sidebar-brand">
-                    <a href="#">
-                       Bootstrap 3
-                    </a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-fw fa-home"></i> Home</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-fw fa-folder"></i> CPU </a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-fw fa-file-o"></i> MEM </a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-fw fa-cog"></i> TCP/UDP </a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-fw fa-cog"></i> IPC </a>
-                </li>
+	<div id="mySidenav" class="sidenav">
+		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+		<a href="#">About</a>
+		<a href="#">Services</a>
+		<a href="#">Clients</a>
+		<a href="#">Contact</a>
+	</div>
 
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                  	<i class="fa fa-fw fa-plus"></i> Dropdown <span class="caret"></span>
-                  </a>
-                  <ul class="dropdown-menu" role="menu">
-                    <li class="dropdown-header">Dropdown heading</li>
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li><a href="#">Separated link</a></li>
-                    <li><a href="#">One more separated link</a></li>
-                  </ul>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-fw fa-bank"></i> Page four</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-fw fa-dropbox"></i> Page 5</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-fw fa-twitter"></i> Last page</a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /#sidebar-wrapper -->
-    </div>
-
-    <div id="wrapper">
+    <div id="main">
         <!-- Page Content 
         <div id="page-content-wrapper">
         -->
 	    <div id="div_header" class="div_area">
 	    	<h1>
-			<button type="button">
+			<button id="trigger" type="button" onclick="openNav()">
 				Menu
 			</button>
 			&nbsp;&nbsp;&nbsp;System Monitoring...
-		</h1>
+			</h1>
 	    </div>
         <div id="div_body" class="div_area">
             <div class="row">
                 <div>
-                    <h1> System Monitoring... </h1>  
+                    <h1> System Monitoring... </h1>
 
                     <p>Originally authored by <a href="http://bootsnipp.com/maridlcrmn">maridlcrmn</a> on Bootsnipp and then converted to Less and customized further by <a href="http://twiter.com/j_holtslander">j_holtslander</a> who is building a <a href="http://codepen.io/collection/nJGkWV" target="_new">collection</a> of great Bootstrap 3 navbars.</p>
                     <p>Maecenas sed diam eget risus varius blandit sit amet non magna. Sed posuere consectetur est at lobortis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Etiam porta sem malesuada magna mollis euismod. Aenean lacinia bibendum nulla sed consectetur. Nulla vitae elit libero, a pharetra augue.</p>
