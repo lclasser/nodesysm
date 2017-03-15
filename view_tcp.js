@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style>html { font-size: 14px; font-family: Arial, Helvetica, sans-serif; }</style>
     <title></title>
 
 <!--
@@ -23,7 +22,7 @@
 			var data_tcp = new kendo.data.DataSource({
 				transport: {
 					read: {
-						url: "http://192.168.0.11:8081/?type=tcp",
+						url: "http://127.0.0.1:8082/?type=tcp",
 						dataType: "json"
 					},
 				}
