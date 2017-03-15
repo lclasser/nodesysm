@@ -124,6 +124,23 @@ module.exports.mem = function(callback)
 	});
 }
 
+module.exports.info = function(callback)
+{
+	console.log("proc_net ------------------------------>");
+
+	async.parallel([module.exports.cpu, module.exports.mem], function(err, results) {
+		var obj_net = {
+			cpu : {},
+			mem : {},
+		};
+		obj_net.cpu = results[0];
+		obj_net.mem = results[1];
+
+		console.log("<------------------------------ proc_net");
+		callback(null, obj_net);
+	});
+}
+
 function hexToIP(val)
 {
 	var ip1 = parseInt("0x" + val.substr(0, 2));
@@ -339,47 +356,206 @@ module.exports.net = function(callback)
 	});
 }
 
-module.exports.ipc = function(callback)
+module.exports.ipcq = function(callback)
 {
-	console.log("ipc ------------------------------>\n");
-	var obj_ipc = {
-		"ipc" : {
-			msg : [{
-				key: 0,
-				msqid : 0,
-				perms : 0,
-				cbytes: 0,
-				qnum : 0,
-				pid : 0,
-				lrpid : 0,
-				stime: 0,
-				rtime : 0,
-				ctime: 0,
-			},],
-			sem : [{
-				key : 0,
-				semid: 0,
-				perms: 0,
-				nsems: 0,
-			},],
-			shm : [{
-				key : 0,
-				shmid : 0,
-				perms : 0,
-				size : 0,
-				nattch : 0,
-				uid : 0,
-				gid : 0,
-				cuid : 0,
-				cgid : 0,
-				atime: 0,
-				dtime: 0,
-				ctime: 0,
-			},],
-		},
-    };
-	
-	console.log("ipc=" + JSON.stringify(obj_ipc) + "\n");
-	console.log("<------------------------------ ipc\n");
-	callback(null, obj_ipc);
+	fs.readFile('/proc/sysvipc/msg', function(err,data) {
+		console.log("ipc-msg ------------------------------>\n");
+
+		var obj_arr = [];
+		var arrcnt = 0;
+		var loopcnt = 0;
+
+		if( err != null ) {
+			console.log("ipc-msg... err");
+			callback(null, null);
+			return;
+		}
+
+		data.toString().split("\n").forEach( function(line) {
+			if( loopcnt <= 0 ) {
+				loopcnt++;
+				return;
+			}
+			loopcnt++;
+
+			line = line.trim();
+			if( line == null || line.length <= 0 ) {
+				// console.log("line length error... [" + line.length + "]");
+				return;
+			}
+
+			var obj_ipcq = {};
+
+			var record = line.replace(/\s+/g,' ');
+			if( record == null ) {
+				console.log("record is null");
+				return;
+			}
+
+			var items = record.split(' ').map(function(item) {
+				return item.trim();
+			});
+			if( items == null || items.length < 7 ) {
+				console.log("items.length < 7");
+				return;
+			}
+
+			obj_ipcq.key     = items[0];
+			obj_ipcq.shmid   = items[1];
+			obj_ipcq.perms   = items[2];
+			obj_ipcq.cbytes  = items[3];
+			obj_ipcq.qnum    = items[4];
+
+			obj_ipcq.lspid   = items[5];
+			obj_ipcq.lrpid   = items[6];
+			obj_ipcq.uid     = items[7];
+			obj_ipcq.gid     = items[8];
+
+			obj_ipcq.stime   = items[9];
+			obj_ipcq.rtime   = items[10];
+			obj_ipcq.ctime   = items[11];
+
+			obj_arr[arrcnt] = obj_ipcq;
+			arrcnt++;
+		});
+
+		console.log("ipc-msg=" + JSON.stringify(obj_arr) + "\n");
+		console.log("<------------------------------ ipc-msg\n");
+		callback(null, obj_arr);
+	});
+}
+
+module.exports.ipcm = function(callback)
+{
+	fs.readFile('/proc/sysvipc/shm', function(err,data) {
+		console.log("ipc-shm ------------------------------>\n");
+
+		var obj_arr = [];
+		var arrcnt = 0;
+		var loopcnt = 0;
+
+		if( err != null ) {
+			console.log("ipc-shm... err");
+			callback(null, null);
+			return;
+		}
+
+		data.toString().split("\n").forEach( function(line) {
+			if( loopcnt <= 0 ) {
+				loopcnt++;
+				return;
+			}
+			loopcnt++;
+
+			line = line.trim();
+			if( line == null || line.length <= 0 ) {
+				// console.log("line length error... [" + line.length + "]");
+				return;
+			}
+
+			var obj_ipcm = {};
+
+			var record = line.replace(/\s+/g,' ');
+			if( record == null ) {
+				console.log("record is null");
+				return;
+			}
+
+			var items = record.split(' ').map(function(item) {
+				return item.trim();
+			});
+			if( items == null || items.length < 7 ) {
+				console.log("items.length < 7");
+				return;
+			}
+			// key
+			obj_ipcm.key     = items[0];
+			obj_ipcm.shmid   = items[1];
+			obj_ipcm.perms   = items[2];
+			obj_ipcm.size    = items[3];
+			//                   items[4]; // cpid
+			//                   items[5]; // lpid
+			obj_ipcm.nattach = items[6];
+			obj_ipcm.muid    = items[7];
+			obj_ipcm.mgid    = items[8];
+			//                   items[9]; // cuid
+			//                   items[10]; // cgid
+			obj_ipcm.atime   = items[11];
+			obj_ipcm.dtime   = items[12];
+			obj_ipcm.ctime   = items[13];
+			obj_ipcm.res     = items[14];
+			obj_ipcm.swap    = items[15];
+
+			obj_arr[arrcnt] = obj_ipcm;
+			arrcnt++;
+		});
+
+		console.log("ipc-shm=" + JSON.stringify(obj_arr) + "\n");
+		console.log("<------------------------------ ipc-shm\n");
+		callback(null, obj_arr);
+	});
+}
+
+module.exports.ipcs = function(callback)
+{
+	fs.readFile('/proc/sysvipc/sem', function(err,data) {
+		console.log("ipc-sem ------------------------------>\n");
+
+		var obj_arr = [];
+		var arrcnt = 0;
+		var loopcnt = 0;
+
+		if( err != null ) {
+			console.log("ipc-sem... err");
+			callback(null, null);
+			return;
+		}
+
+		data.toString().split("\n").forEach( function(line) {
+			if( loopcnt <= 0 ) {
+				loopcnt++;
+				return;
+			}
+			loopcnt++;
+
+			line = line.trim();
+			if( line == null || line.length <= 0 ) {
+				// console.log("line length error... [" + line.length + "]");
+				return;
+			}
+
+			var obj_ipcs = {};
+
+			var record = line.replace(/\s+/g,' ');
+			if( record == null ) {
+				console.log("record is null");
+				return;
+			}
+
+			var items = record.split(' ').map(function(item) {
+				return item.trim();
+			});
+			if( items == null || items.length < 7 ) {
+				console.log("items.length < 7");
+				return;
+			}
+
+			// key
+			obj_ipcs.key     = items[0];
+			obj_ipcs.semid   = items[1];
+			obj_ipcs.perms   = items[2];
+			obj_ipcs.nsems   = items[3];
+			obj_ipcs.uid     = items[5];
+			obj_ipcs.gid     = items[6];
+			obj_ipcs.otime   = items[7];
+			obj_ipcs.ctime   = items[8];
+
+			obj_arr[arrcnt] = obj_ipcs;
+			arrcnt++;
+		});
+
+		console.log("ipc-sem=" + JSON.stringify(obj_arr) + "\n");
+		console.log("<------------------------------ ipc-sem\n");
+		callback(null, obj_arr);
+	});
 }

@@ -3,7 +3,6 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-    <style>html { font-size: 14px; font-family: Arial, Helvetica, sans-serif; }</style>
     <title></title>
     <!--
     <link rel="stylesheet" href="http://kendo.cdn.telerik.com/2017.1.118/styles/kendo.common.min.css" />
@@ -19,8 +18,20 @@
 -->
 	<script>
 		$(document).ready(function(){
-			$.getJSON("http://192.168.0.11:8081/?type=cpu",function(result) {
-				$.each(result, function(key, field) {
+			$.getJSON("http://127.0.0.1:8082/?type=info",function(result) {
+				$.each(result.cpu, function(key, field) {
+					var name = "#" + key;
+					$(name).prepend(field);
+			    });
+			});
+		});
+		$(document).ready(function(){
+			$.getJSON("http://127.0.0.1:8082/?type=info",function(result) {
+				$.each(result.cpu, function(key, field) {
+					var name = "#" + key;
+					$(name).prepend(field);
+			    });
+				$.each(result.mem, function(key, field) {
 					var name = "#" + key;
 					$(name).prepend(field);
 			    });
@@ -83,6 +94,26 @@
 				<tr class="k-alt" role="row">
 					<td role="gridcell">bogomips</td>
 					<td role="gridcell" id="bogomips"></td>
+				</tr>
+
+				<tr class="k-alt" role="row">
+				</tr>
+
+				<tr class="k-alt" role="row">
+					<td role="gridcell">Memory-Total</td>
+					<td role="gridcell" id="total"></td>
+				</tr>
+				<tr class="k-alt" role="row">
+					<td role="gridcell">Memory-Free</td>
+					<td role="gridcell" id="free"></td>
+				</tr>
+				<tr class="k-alt" role="row">
+					<td role="gridcell">Memory-available</td>
+					<td role="gridcell" id="available"></td>
+				</tr>
+				<tr class="k-alt" role="row">
+					<td role="gridcell">Memory-Swap</td>
+					<td role="gridcell" id="swap"></td>
 				</tr>
 			</tbody>
 		</table>

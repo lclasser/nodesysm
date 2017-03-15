@@ -67,10 +67,14 @@ function server_accepted(req, res)
 	// URL - type
 	/////////////////////////////////////////////////////////////
 	var funcs = {
+		info: sysm.info,
 		cpu : sysm.cpu,
 		mem : sysm.mem,
 		tcp : sysm.tcp,
 		udp : sysm.udp,
+		ipcq : sysm.ipcq,
+		ipcm : sysm.ipcm,
+		ipcs : sysm.ipcs,
 	};
 	var names = [];
 	var procs = null;

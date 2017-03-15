@@ -9,10 +9,12 @@
     <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.blueopal.min.css" />
 
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="//code.jquery.com/jquery.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2017.1.118/js/kendo.all.min.js"></script>
 
 <!--
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 -->
 	<script type="text/javascript">
@@ -49,6 +51,12 @@
 		function viewTcp() {
 			$("#contentbody").load("view_tcp.js");
 		}
+		function viewUdp() {
+			$("#contentbody").load("view_udp.js");
+		}
+		function viewIPCM() {
+			$("#contentbody").load("view_ipcm.js");
+		}
 
 		function div2Resize() {
 			/*
@@ -80,7 +88,8 @@
 			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
 			<a href="javascript:void(0)" onclick="viewInfo()"> Info </a>
 			<a href="javascript:void(0)" onclick="viewTcp()"> TCP </a>
-			<a href="javascript:void(0)">Clients</a>
+			<a href="javascript:void(0)" onclick="viewUdp()"> UDP </a>
+			<a href="javascript:void(0)" onclick="viewIPCM()")> IPC-SHM </a>
 			<a href="javascript:void(0)">Contact</a>
 		</div>
 
