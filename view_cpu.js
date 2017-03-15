@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<base href="http://demos.telerik.com/kendo-ui/grid/index">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
     <style>html { font-size: 14px; font-family: Arial, Helvetica, sans-serif; }</style>
     <title></title>
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.1.118/styles/kendo.common.min.css" />
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.1.118/styles/kendo.blueopal.min.css" />
-
+    <!--
+    <link rel="stylesheet" href="http://kendo.cdn.telerik.com/2017.1.118/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="http://kendo.cdn.telerik.com/2017.1.118/styles/kendo.blueopal.min.css" />
     <script src="https://kendo.cdn.telerik.com/2017.1.118/js/jquery.min.js"></script>
-    <script src="https://kendo.cdn.telerik.com/2017.1.118/js/kendo.all.min.js"></script>
+    -->
+<!--
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.blueopal.min.css" />
 
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2017.1.118/js/kendo.all.min.js"></script>
+-->
 	<script>
 		$(document).ready(function(){
-			$.getJSON("http://192.168.73.11:8081/?type=cpu",function(result) {
+			$.getJSON("http://192.168.0.11:8081/?type=cpu",function(result) {
 				$.each(result, function(key, field) {
 					var name = "#" + key;
 					$(name).prepend(field);
@@ -37,8 +44,8 @@
 
 				<thead role="rowgroup">
 					<tr role="row">
-						<th class="k-header" role="columnheader" aria-haspopup="true" rowspan="1" scope="col">Ç×¸ñ</th>
-						<th class="k-header" role="columnheader" aria-haspopup="true" rowspan="1" scope="col">³»¿ë</th>
+						<th class="k-header" role="columnheader" aria-haspopup="true" rowspan="1" scope="col">í•­ëª©</th>
+						<th class="k-header" role="columnheader" aria-haspopup="true" rowspan="1" scope="col">ë‚´ìš©</th>
 					</tr>
 				</thead>
 			</table>

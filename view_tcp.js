@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <base href="http://demos.telerik.com/kendo-ui/grid/index">
     <style>html { font-size: 14px; font-family: Arial, Helvetica, sans-serif; }</style>
     <title></title>
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.1.118/styles/kendo.common.min.css" />
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.1.118/styles/kendo.blueopal.min.css" />
 
-    <script src="https://kendo.cdn.telerik.com/2017.1.118/js/jquery.min.js"></script>
+<!--
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.blueopal.min.css" />
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2017.1.118/js/kendo.all.min.js"></script>
+-->
 </head>
 <body>
 
@@ -21,7 +23,7 @@
 			var data_tcp = new kendo.data.DataSource({
 				transport: {
 					read: {
-						url: "http://192.168.73.11:8081/?type=tcp",
+						url: "http://192.168.0.11:8081/?type=tcp",
 						dataType: "json"
 					},
 				}
