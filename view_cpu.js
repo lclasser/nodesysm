@@ -23,14 +23,6 @@
 					var name = "#" + key;
 					$(name).prepend(field);
 			    });
-			});
-		});
-		$(document).ready(function(){
-			$.getJSON("http://127.0.0.1:8082/?type=info",function(result) {
-				$.each(result.cpu, function(key, field) {
-					var name = "#" + key;
-					$(name).prepend(field);
-			    });
 				$.each(result.mem, function(key, field) {
 					var name = "#" + key;
 					$(name).prepend(field);
