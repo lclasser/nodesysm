@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+<!--
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.blueopal.min.css" />
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2017.1.118/js/kendo.all.min.js"></script>
+-->
+</head>
+<body>
+
+<h2> sysvIPC Queue </h2>
+
+<div id="example">
+    <div id="grid"></div>
+    <script>
+        $(document).ready(function () {
+			var data_tcp = new kendo.data.DataSource({
+				transport: {
+					read: {
+						url: "./main.js?type=ipcq",
+						dataType: "json"
+					},
+				}
+			});
+
+            $("#grid").kendoGrid({
+                dataSource: data_tcp,
+                height: 450,
+                groupable: true,
+                sortable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                columns: [
+                	{
+	                	field: "key",
+	                    title: "Msg KEY",
+	                    width: 70,
+	                }, {
+	                    field: "msqid",
+	                    title: "Msg ID",
+	                    width: 70,
+	                }, {
+	                	field: "perms",
+	                    title: "Permission",
+	                    width: 40,
+	                }, {
+	                    field: "cbytes",
+	                    title: "cbytes",
+	                    width: 70,
+	                }, {
+	                    field: "qnum",
+	                    title: "qnum",
+	                    width: 30,
+	                }, {
+	                    field: "lspid",
+	                    title: "lspid",
+	                    width: 70,
+	                }, {
+	                    field: "lrpid",
+	                    title: "lrpid",
+	                    width: 120,
+	                }, {
+	                    field: "uid",
+	                    title: "uid",
+	                    width: 120,
+	                }, {
+	                    field: "gid",
+	                    title: "gid",
+	                    width: 120,
+	                }, {
+	                    field: "stime",
+	                    title: "stime",
+	                    width: 120,
+	                }, {
+	                    field: "rtime",
+	                    title: "rtime",
+	                    width: 120,
+	                }, {
+	                    field: "ctime",
+	                    title: "ctime",
+	                    width: 120,
+	                }
+				]
+            });
+        });
+    </script>
+</div>
+
+</body>
+</html>

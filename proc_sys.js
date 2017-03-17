@@ -401,7 +401,7 @@ module.exports.ipcq = function(callback)
 			}
 
 			obj_ipcq.key     = items[0];
-			obj_ipcq.shmid   = items[1];
+			obj_ipcq.msqid   = items[1];
 			obj_ipcq.perms   = items[2];
 			obj_ipcq.cbytes  = items[3];
 			obj_ipcq.qnum    = items[4];

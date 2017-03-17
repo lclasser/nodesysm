@@ -57,7 +57,12 @@
 		function viewIPCM() {
 			$("#contentbody").load("view_ipcm.js");
 		}
-
+		function viewIPCQ() {
+			$("#contentbody").load("view_ipcq.js");
+		}
+		function viewIPCS() {
+			$("#contentbody").load("view_ipcs.js");
+		}
 		function div2Resize() {
 			/*
 			var h1 = window.getComputedStyle(document.querySelector(".contenthead")).height;
@@ -90,6 +95,8 @@
 			<a href="javascript:void(0)" onclick="viewTcp()"> TCP </a>
 			<a href="javascript:void(0)" onclick="viewUdp()"> UDP </a>
 			<a href="javascript:void(0)" onclick="viewIPCM()")> IPC-SHM </a>
+			<a href="javascript:void(0)" onclick="viewIPCQ()")> IPC-QUE </a>
+			<a href="javascript:void(0)" onclick="viewIPCS()")> IPC-SEM </a>
 			<a href="javascript:void(0)">Contact</a>
 		</div>
 
