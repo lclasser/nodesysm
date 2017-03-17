@@ -35,35 +35,62 @@ function server_accepted(req, res)
 	console.log("####################################################################");
 	console.log("Accepted...");
 
+	var qtype = null;
 	var qry = url.parse(req.url, '&');
+	if( qry != null ) {
+		qtype = qry.query['type'];
+	}
 
 	/////////////////////////////////////////////////////////////
 	// URL - path (routing...)
 	/////////////////////////////////////////////////////////////
-	var url_path = qry.pathname;
-	var url_item = url_path.split("/");
+	if( qtype == null ) {
+		var url_path = qry.pathname;
+		var url_item = url_path.split("/");
 
-	for( var item of url_item ) {
-		console.log("url:" + item);
-		if( item == "main.js" )
-			continue;
-		if( item.length > 0 ) {
-			console.log("Routing...........[" + item + "]");
+		var filename = null;
+		if( url_item.length > 0 ) {
+			for( var item of url_item ) {
+				item.trim();
+				console.log("url:" + item);
+
+				if( item.indexOf("..") > 0 ||
+					item.indexOf("~") > 0 ) {
+					filename = null;
+					break;
+				}
+
+				if( item.indexOf(".html") > 0 ||
+					item.indexOf(".css") > 0 ) {
+					console.log("file:" + item);
+					filename = item;
+					break;
+				}
+			}
+
+			if( filename == null ) {
+				filename = "view_main.html";
+			}
+		}
+
+		console.log("filename:" + filename);
+		if( filename.length > 0 ) {
+			console.log("Routing...........[" + filename + "]");
 
 			// res.sendFile("./view_tcp.js");
 			// res.sendFile("view_tcp.js", {root: __dirname});
-			fs.readFile(item, function(err, data) {
+			fs.readFile(filename, function(err, data) {
 				// if( err ) throw err;
 				if( err ) { console.log("view_tcp.js error..."); return; }
 				res.write(data);
 				res.end();
 				
-				console.log("Routing finish... [" + item + "]");
+				console.log("Routing finish... [" + filename + "]");
 			});
-			return;
 		}
+		console.log("path:" + qry.pathname);
+		return;
 	}
-	console.log("path:" + qry.pathname);
 
 	/////////////////////////////////////////////////////////////
 	// URL - type
@@ -81,10 +108,7 @@ function server_accepted(req, res)
 	var names = [];
 	var procs = null;
 
-	var qtype = null;
 	if( qry != null ) {
-		qtype = qry.query['type'];
-
 		console.log("type[" + qtype + "]");
 		if( qtype != null ) {
 			names = [qtype,];
@@ -136,14 +160,14 @@ function server_accepted(req, res)
 
 			var rtn = JSON.stringify(sysinfo);
 
-			console.log("#########################################\n");
+			console.log("-------------------------------------------");
 			console.log("async:" + rtn);
-			console.log("#########################################\n");
+			console.log("-------------------------------------------");
 
 			console.log('elapsed time : '+(nowd.getTime() - dt_s));
 
-		    res.writeHead(200, { 'Content-Type': 'text/plain' });
-		    // res.writeHead(200, { 'Content-Type': 'application/json' });
+		    // res.writeHead(200, { 'Content-Type': 'text/plain' });
+		    res.writeHead(200, { 'Content-Type': 'application/json' });
 			res.write(rtn);
 		    res.end();
 		}

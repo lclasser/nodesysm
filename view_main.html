@@ -9,10 +9,11 @@
     <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.blueopal.min.css" />
 
-    <script src="//code.jquery.com/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2017.1.118/js/kendo.all.min.js"></script>
 
 <!--
+    <script src="//code.jquery.com/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -27,6 +28,8 @@
 					return element.currentStyle;
 				}
 			}
+
+			viewInfo();
 		}
 
 		/* Set the width of the side navigation to 250px and the left margin of the page content to 250px */
@@ -46,23 +49,24 @@
 				document.getElementById("contents").innerHTML = "Changing..";
 				document.getElementById("contents").href = "http://192.168.0.11:8081/view_cpu.js";
 			*/
-			$("#contentbody").load("view_cpu.js");
+			$("#contentbody").load("view_info.html");
 		}
 		function viewTcp() {
-			$("#contentbody").load("view_tcp.js");
+			$("#contentbody").load("view_tcp.html");
 		}
 		function viewUdp() {
-			$("#contentbody").load("view_udp.js");
+			$("#contentbody").load("view_udp.html");
 		}
 		function viewIPCM() {
-			$("#contentbody").load("view_ipcm.js");
+			$("#contentbody").load("view_ipcm.html");
 		}
 		function viewIPCQ() {
-			$("#contentbody").load("view_ipcq.js");
+			$("#contentbody").load("view_ipcq.html");
 		}
 		function viewIPCS() {
-			$("#contentbody").load("view_ipcs.js");
+			$("#contentbody").load("view_ipcs.html");
 		}
+
 		function div2Resize() {
 			/*
 			var h1 = window.getComputedStyle(document.querySelector(".contenthead")).height;
@@ -88,25 +92,27 @@
 </head>
 
 <body>
-	<div id="wrapperDiv">
-		<div id="mySidenav" class="sidenav">
-			<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-			<a href="javascript:void(0)" onclick="viewInfo()"> Info </a>
-			<a href="javascript:void(0)" onclick="viewTcp()"> TCP </a>
-			<a href="javascript:void(0)" onclick="viewUdp()"> UDP </a>
-			<a href="javascript:void(0)" onclick="viewIPCM()")> IPC-SHM </a>
-			<a href="javascript:void(0)" onclick="viewIPCQ()")> IPC-QUE </a>
-			<a href="javascript:void(0)" onclick="viewIPCS()")> IPC-SEM </a>
-			<a href="javascript:void(0)">Contact</a>
-		</div>
-
-		<div id="contenthead">
-			<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; open</span>
-		</div>
-
-	    <div id="contentbody" onclick="closeNav()">
-	    	test...
-	    </div>
+	<div id="mySidenav" class="sidenav">
+		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+		<a href="javascript:void(0)" onclick="viewInfo()"> Info </a>
+		<a href="javascript:void(0)" onclick="viewTcp()"> TCP </a>
+		<a href="javascript:void(0)" onclick="viewUdp()"> UDP </a>
+		<a href="javascript:void(0)" onclick="viewIPCM()"> IPC-SHM </a>
+		<a href="javascript:void(0)" onclick="viewIPCQ()"> IPC-QUE </a>
+		<a href="javascript:void(0)" onclick="viewIPCS()"> IPC-SEM </a>
+		<a href="javascript:void(0)">Contact</a>
 	</div>
+
+	<div id="contenthead">
+		<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Menu </span>
+	</div>
+
+	<!--
+	<div id="wrapperDiv" onclick="closeNav()">
+	</div>
+	-->
+    <div id="contentbody" onclick="closeNav()">
+    </div>
 </body>
 </html>
+

@@ -3,9 +3,9 @@
 html, body { 
 	height:100%; 
 	overflow:hidden; 
-	background-color:silver; 
-	padding: 0px;
-	margin: 0px;
+	background-color: white; 
+	padding: 1px;
+	margin: 1px;
 }
 
 /* The side navigation menu */
@@ -16,10 +16,10 @@ html, body {
 	width: 0; /* 0 width - change this with JavaScript */
 	top: 0;
 	left: 0;
-	background-color: #FF00FF; /* #111; */ /* Black*/
+	background-color: #55AEFF; /* #111; */ /* Black*/
 	overflow-x: hidden; /* Disable horizontal scroll */
 	overflow-y: hidden; /* Disable horizontal scroll */
-	padding-top: 60px; /* Place content 60px from the top */
+	padding-top: 40px; /* Place content 60px from the top */
 	transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
 }
 
@@ -65,7 +65,10 @@ html, body {
 }
 
 #contenthead {
-	background-color: #D0A;
+	color: white;
+	background-color: #005097;
+    margin: 1px;
+    padding: 0px;
 	/*
 	overflow-x: hidden;
 	overflow-y: hidden;
@@ -76,7 +79,7 @@ html, body {
 #contentbody {
 	position: absolute;
 	width: 100%;
-	background-color: powderblue;
+	background-color: #C6EAFF;
 	/*
 	overflow-x: hidden;
 	overflow-y: hidden;
