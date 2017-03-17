@@ -18,7 +18,7 @@
 -->
 	<script>
 		$(document).ready(function(){
-			$.getJSON("http://127.0.0.1:8082/?type=info",function(result) {
+			$.getJSON("./main.js?type=info",function(result) {
 				$.each(result.cpu, function(key, field) {
 					var name = "#" + key;
 					$(name).prepend(field);

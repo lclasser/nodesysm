@@ -45,6 +45,8 @@ function server_accepted(req, res)
 
 	for( var item of url_item ) {
 		console.log("url:" + item);
+		if( item == "main.js" )
+			continue;
 		if( item.length > 0 ) {
 			console.log("Routing...........[" + item + "]");
 

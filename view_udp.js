@@ -22,7 +22,7 @@
 			var data_udp = new kendo.data.DataSource({
 				transport: {
 					read: {
-						url: "http://127.0.0.1:8082/?type=udp",
+						url: "./main.js?type=udp",
 						dataType: "json"
 					},
 				}
