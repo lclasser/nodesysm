@@ -40,7 +40,7 @@ function onRequest(req, res)
 }
 
 var server = http.createServer(onRequest);
-server.listen(8083, '127.0.0.1');
+server.listen(8083);
 console.log('Server running at http://127.0.0.1:8083/');
 
 
@@ -52,6 +52,7 @@ var message = new gcm.Message({
 	}
 });
 */
+
 /**
  * Params: message-literal, registrationIds-array, No. of retries, callback-function
 sender.send(message, "/topics/noti".toString(), function (err, result) {  

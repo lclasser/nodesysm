@@ -7,6 +7,7 @@ var async = require('async');
 var url = require('url');
 
 var sysm = require('./proc_sys');
+var push = require('./proc_push');
 
 function dateFormat (date, fstr, utc) {
   utc = utc ? 'getUTC' : 'get';
@@ -30,16 +31,19 @@ function sleep(milliSeconds) {
 	while (new Date().getTime() < startTime + milliSeconds);
 }
 
-function server_accepted(req, res)
+function recv_after(req, res)
 {
 	console.log("####################################################################");
 	console.log("Accepted...");
 
 	var qtype = null;
 	var qry = url.parse(req.url, '&');
-	if( qry != null ) {
-		qtype = qry.query['type'];
+	if( qry == null ) {
+			res.write('Not found pages.');
+			res.end();
 	}
+
+	qtype = qry.query['type'];
 
 	/////////////////////////////////////////////////////////////
 	// URL - path (routing...)
@@ -95,25 +99,32 @@ function server_accepted(req, res)
 	/////////////////////////////////////////////////////////////
 	// URL - type
 	/////////////////////////////////////////////////////////////
-	var funcs = {
-		info: sysm.info,
-		cpu : sysm.cpu,
-		mem : sysm.mem,
-		tcp : sysm.tcp,
-		udp : sysm.udp,
-		ipcq : sysm.ipcq,
-		ipcm : sysm.ipcm,
-		ipcs : sysm.ipcs,
-	};
-	var names = [];
-	var procs = null;
+	if( qtype == 'push' ) {
+		push.push_gcm(req.body, function(err, result) {
+		    console.log(JSON.stringify(result));
 
-	if( qry != null ) {
+			res.writeHead(200, {'Content-Type': 'text/html'});
+		    res.write(JSON.stringify(result));
+		    res.end();
+		});
+	    return;
+	} else {
+		var funcs = {
+			info: sysm.info,
+			cpu : sysm.cpu,
+			mem : sysm.mem,
+			tcp : sysm.tcp,
+			udp : sysm.udp,
+			ipcq : sysm.ipcq,
+			ipcm : sysm.ipcm,
+			ipcs : sysm.ipcs,
+		};
+		var names = [];
+		var procs = null;
+
 		console.log("type[" + qtype + "]");
-		if( qtype != null ) {
-			names = [qtype,];
-			procs = [funcs[qtype]];
-		}
+		names = [qtype,];
+		procs = [funcs[qtype]];
 	}
 
 	/////////////////////////////////////////////////////////////
@@ -172,6 +183,36 @@ function server_accepted(req, res)
 		    res.end();
 		}
 	);
+}
+
+function server_accepted(req, res)
+{
+	console.log("####################################################################");
+	console.log("Accepted...");
+
+	if( req.method == 'POST' ) {
+		console.log("Method: POST");
+		var body = '';
+
+		req.on('data', function (data) {
+	        body += data;
+	        if (body.length > 1e6) { 
+	            req.connection.destroy();
+	        }
+	    });
+	    req.on('end', function () {
+			req.body = body;
+			console.log("body:" + body);
+			console.log("body:" + req.body);
+			
+			recv_after(req, res);
+		});
+	} else {
+		console.log("Method: GET");
+		req.body = null;
+
+		recv_after(req, res);
+	}
 }
 
 var server_main = http.createServer(server_accepted);
