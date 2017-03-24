@@ -107,7 +107,8 @@ function recv_after(req, res)
 			ipcq : psys.ipcq,
 			ipcm : psys.ipcm,
 			ipcs : psys.ipcs,
-			amem : pdat.mem,
+			memh : pdat.memh,
+			memm : pdat.memm,
 		};
 		var names = [];
 		var procs = null;

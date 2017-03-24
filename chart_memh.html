@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<!--
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.1.223/styles/kendo.common-material.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.1.223/styles/kendo.material.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.1.223/styles/kendo.material.mobile.min.css" />
+
+    <script src="https://kendo.cdn.telerik.com/2017.1.223/js/jquery.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2017.1.223/js/kendo.all.min.js"></script>
+-->
+</head>
+<body>
+<div id="example">
+    <div class="demo-section k-content wide">
+        <div id="chart"></div>
+    </div>
+
+    <script>
+        function createChart() {
+            var dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "./main.js?type=memh",
+                        dataType: "json",
+                        type: "POST",
+                    }
+                }
+            });
+
+            $("#chart").kendoChart({
+            	dataSource: dataSource,
+                title: {
+                    text: "Memory Chart(Hour)"
+                },
+                seriesDefaults: {
+                	type: "rangeColumn",
+                },
+                series:
+                [{
+                    fromField: "free1",
+                    toField: "free2",
+                    name: "Free",
+                }, {
+                    fromField: "swap1",
+                    toField: "swap2",
+                    name: "Swap",
+                }],
+                categoryAxis: {
+                    field: "hour1",
+                    labels: {
+                        rotation: "auto",
+                    },
+                },
+                tooltip: {
+                    visible: true,
+                    template: "#= value.from #<br>" +
+                              "#= value.to #",
+                }
+            });
+
+			/*
+			dataSource.fetch(function() {
+				var product = dataSource.at(0);
+				alert(product.hour1);
+			});
+			*/
+        }
+
+        $(document).ready(createChart);
+        $(document).bind("kendo:skinChange", createChart);
+    </script>
+</div>
+
+
+</body>
+</html>

@@ -26,7 +26,7 @@
                 dataSource: {
                     transport: {
                         read: {
-                            url: "./main.js?type=amem",
+                            url: "./main.js?type=memm",
                             dataType: "json"
                         }
                     },
@@ -46,14 +46,14 @@
                     missingValues: "gap",
                 },
                 series: [{
-                    field: "total",
-                    name: "Total"
-                }, {
                     field: "free",
                     name: "Free"
                 }, {
                     field: "swap",
                     name: "swap"
+                },{
+                    field: "total",
+                    name: "Total"
                 }],
                 categoryAxis: {
                     field: "itime",

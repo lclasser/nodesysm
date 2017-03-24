@@ -35,12 +35,43 @@ module.exports.mem_insert = function(err, results) {
 	});
 }
 
-module.exports.mem_select = function(cnt, callback) {
+module.exports.mem_min_select = function(cnt, callback) {
 	var sql = "SELECT date_format(itime,'%H:%i:%s') as itime, ROUND(total/1000) as total, ROUND(free/1000) as free, ROUND(avail/1000) as avail, ROUND(swap/1000) as swap FROM proc_mem ORDER BY ino DESC LIMIT " + cnt;
 
 	connection.query(sql, function(err, rows) {
 		if( err != null ) {
-			console.log('mem_select err:', err);
+			console.log('mem_min_select err:', err);
+		} else {
+			// console.log(rows);
+			console.log("-------");
+
+			var rst = [];
+			for(var idx of rows) {
+				rst.push(Object.assign({}, idx));
+			}
+			console.log(rst);
+			// console.log("-------");
+			callback(rst);
+		}
+	});
+}
+
+module.exports.mem_hour_select = function(cnt, callback) {
+	var sql = "SELECT date_format(itime,'%H:%i:%s') as itime, ROUND(total/1000) as total, ROUND(free/1000) as free, ROUND(avail/1000) as avail, ROUND(swap/1000) as swap FROM proc_mem ORDER BY ino DESC LIMIT " + cnt;
+
+	var sql = 
+		"SELECT date_format(itime, '%Y%m%d%H') as hour, "
+		+ "max(total) as total, "
+	    + "max(free) as free1, min(free) as free2, "
+	    + "max(swap) as swap1, min(swap) as swap2 "
+		+ "FROM proc_mem "
+		+ "GROUP BY hour "
+		+ "ORDER BY hour desc "
+	;
+
+	connection.query(sql, function(err, rows) {
+		if( err != null ) {
+			console.log('mem_hour_select err:', err);
 		} else {
 			// console.log(rows);
 			console.log("-------");
