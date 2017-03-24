@@ -5,12 +5,15 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8">
 
-	<link rel="stylesheet" type="text/css" href="./side_menu.css">
     <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.common.min.css" />
     <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.blueopal.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.1.223/styles/kendo.common-material.min.css" />
+	<link rel="stylesheet" type="text/css" href="./side_menu.css">
 
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2017.1.118/js/kendo.all.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2017.1.223/js/kendo.all.min.js"></script>
+
 
 <!--
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -66,7 +69,9 @@
 		function viewIPCS() {
 			$("#contentbody").load("view_ipcs.html");
 		}
-
+		function chartMEM() {
+			$("#contentbody").load("chart_mem.html");
+		}
 		function div2Resize() {
 			/*
 			var h1 = window.getComputedStyle(document.querySelector(".contenthead")).height;
@@ -100,6 +105,7 @@
 		<a href="javascript:void(0)" onclick="viewIPCM()"> IPC-SHM </a>
 		<a href="javascript:void(0)" onclick="viewIPCQ()"> IPC-QUE </a>
 		<a href="javascript:void(0)" onclick="viewIPCS()"> IPC-SEM </a>
+		<a href="javascript:void(0)" onclick="chartMEM()"> Memory Hist </a>
 		<a href="javascript:void(0)">Contact</a>
 	</div>
 

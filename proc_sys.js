@@ -1,5 +1,7 @@
 var fs = require("fs");
 var async = require('async');
+var util = require('util');
+var ustd = require('./util_std');
 
 function parseInfo(col) {
 	var str = col;
@@ -8,6 +10,7 @@ function parseInfo(col) {
 		return str.substr(pos + 1).trim();
 	return "";
 }
+
 module.exports.cpu = function(callback)
 {
 	fs.readFile('/proc/cpuinfo', function(err,data) {
@@ -118,7 +121,7 @@ module.exports.mem = function(callback)
 		}
 		obj_mem.swap = swap_tot - swap_free;
 
-		console.log("mem=" + JSON.stringify(obj_mem));
+		// console.log("mem=" + JSON.stringify(obj_mem));
 		console.log("<------------------------------ proc_mem");
 		callback(null, obj_mem);
 	});
@@ -151,191 +154,150 @@ function hexToIP(val)
 	return ip4 + "." + ip3 + "." + ip2 + "." + ip1;
 }
 
+function parse_tcp(data, flag, obj_arr) {
+
+	var loopcnt = 0;
+
+	data.toString().split("\n").forEach( function(line) {
+		if( loopcnt <= 0 ) {
+			loopcnt++;
+			return;
+		}
+		loopcnt++;
+
+		line = line.trim();
+		if( line == null || line.length <= 0 ) {
+			// console.log("line length error... [" + line.length + "]");
+			return;
+		}
+
+		var obj_tcp  = {};
+
+		var record = line.replace(/\s+/g,' ');
+		if( record == null ) {
+			console.log("record is null");
+			return;
+		}
+
+		var items = record.split(' ').map(function(item) {
+			return item.trim();
+		});
+		if( items == null || items.length < 7 ) {
+			console.log("items.length < 7");
+			return;
+		}
+
+		var cols;
+		
+		obj_tcp.ntype = flag;
+		
+		// local_address
+		cols = items[1].split(':');
+		if( cols != null ) {
+			obj_tcp.lip   = hexToIP(cols[0]);
+			obj_tcp.lport = parseInt("0x" + cols[1]);
+		}
+
+		// remote_address
+		cols = items[2].split(':');
+		if( cols != null ) {
+			obj_tcp.rip   = hexToIP(cols[0]);
+			obj_tcp.rport = parseInt("0x" + cols[1]);
+		}
+
+		// status
+		var net_state = {
+			0  : "NONE" ,
+			1  : "ESTABLISHED" ,
+			2  : "SYN_SENT" ,
+			3  : "SYN_RECV" ,
+			4  : "FIN_WAIT1" ,
+			5  : "FIN_WAIT2" ,
+			6  : "TIME_WAIT" ,
+			7  : "CLOSE" ,
+			8  : "CLOSE_WAIT" ,
+			9  : "LAST_ACK" ,
+			10 : "LISTEN" ,
+			11 : "CLOSING" ,
+		};
+		obj_tcp.st = net_state[ parseInt("0x" + items[3]) ];
+
+		// tx,rx
+		cols = items[4].split(':');
+		if( cols != null ) {
+			obj_tcp.tx_queue = parseInt("0x" + cols[0]);
+			obj_tcp.rx_queue = parseInt("0x" + cols[1]);
+		}
+
+		obj_arr.push(obj_tcp);
+	});
+}
+
 module.exports.tcp = function(callback)
 {
 	fs.readFile('/proc/net/tcp', function(err,data) {
-		console.log("proc_net.net_tcp ------------------------------>");
-
-		var obj_arr = [];
-		var arrcnt = 0;
-		var loopcnt = 0;
-
+		console.log("proc_tcp ------------------------------>");
 		if( err != null ) {
 			console.log("net_tcp... err");
 			callback(null, null);
 			return;
 		}
 
-		data.toString().split("\n").forEach( function(line) {
-			if( loopcnt <= 0 ) {
-				loopcnt++;
+		var obj_arr = [];
+		parse_tcp(data, "tcp", obj_arr);
+
+		fs.readFile('/proc/net/tcp6', function(err,data) {
+			// console.log("proc_net.net_tcp6 ------------------------------>");
+			if( err != null ) {
+				console.log("net_tcp6... err");
+				callback(null, obj_arr);
 				return;
 			}
-			loopcnt++;
+			parse_tcp(data, "tcp6", obj_arr);
 
-			line = line.trim();
-			if( line == null || line.length <= 0 ) {
-				// console.log("line length error... [" + line.length + "]");
-				return;
-			}
-
-			var obj_tcp  = {};
-
-			var record = line.replace(/\s+/g,' ');
-			if( record == null ) {
-				console.log("record is null");
-				return;
-			}
-
-			var items = record.split(' ').map(function(item) {
-				return item.trim();
+			/*
+			obj_arr.sort(function(a,b) {
 			});
-			if( items == null || items.length < 7 ) {
-				console.log("items.length < 7");
-				return;
-			}
+			*/
 
-			var cols;
-			
-			// local_address
-			cols = items[1].split(':');
-			if( cols != null ) {
-				obj_tcp.lip   = hexToIP(cols[0]);
-				obj_tcp.lport = parseInt("0x" + cols[1]);
-			}
-
-			// remote_address
-			cols = items[2].split(':');
-			if( cols != null ) {
-				obj_tcp.rip   = hexToIP(cols[0]);
-				obj_tcp.rport = parseInt("0x" + cols[1]);
-			}
-
-			// status
-			var net_state = {
-				0  : "NONE" ,
-				1  : "ESTABLISHED" ,
-				2  : "SYN_SENT" ,
-				3  : "SYN_RECV" ,
-				4  : "FIN_WAIT1" ,
-				5  : "FIN_WAIT2" ,
-				6  : "TIME_WAIT" ,
-				7  : "CLOSE" ,
-				8  : "CLOSE_WAIT" ,
-				9  : "LAST_ACK" ,
-				10 : "LISTEN" ,
-				11 : "CLOSING" ,
-			};
-			obj_tcp.st = net_state[ parseInt("0x" + items[3]) ];
-
-			// tx,rx
-			cols = items[4].split(':');
-			if( cols != null ) {
-				obj_tcp.tx_queue   = parseInt("0x" + cols[0]);
-				obj_tcp.rx_queue = parseInt("0x" + cols[1]);
-			}
-
-			obj_arr[arrcnt] = obj_tcp;
-			arrcnt++;
+			console.log("<------------------------------ proc_tcp");
+			// console.log("net_tcp:" + JSON.stringify(obj_arr));
+			callback(null, obj_arr);
 		});
-
-		// console.log("net_tcp:" + JSON.stringify(obj_arr));
-		console.log("<------------------------------ proc_net.net_tcp");
-		callback(null, obj_arr);
 	});
 }
 
 module.exports.udp = function(callback)
 {
 	fs.readFile('/proc/net/udp', function(err,data) {
-		console.log("proc_net.net_udp ------------------------------>");
-
-		var obj_arr = [];
-		var arrcnt = 0;
-		var loopcnt = 0;
-
+		console.log("proc_udp ------------------------------>");
 		if( err != null ) {
 			console.log("net_udp... err");
 			callback(null, null);
 			return;
 		}
 
-		data.toString().split("\n").forEach( function(line) {
-			if( loopcnt <= 0 ) {
-				loopcnt++;
+		var obj_arr = [];
+		parse_tcp(data, "udp", obj_arr);
+
+		fs.readFile('/proc/net/udp6', function(err,data) {
+			// console.log("proc_net.net_tcp6 ------------------------------>");
+			if( err != null ) {
+				console.log("net_udp6... err");
+				callback(null, obj_arr);
 				return;
 			}
-			loopcnt++;
+			parse_tcp(data, "udp6", obj_arr);
 
-			line = line.trim();
-			if( line == null || line.length <= 0 ) {
-				// console.log("line length error... [" + line.length + "]");
-				return;
-			}
-
-			var obj_tcp  = {};
-
-			var record = line.replace(/\s+/g,' ');
-			if( record == null ) {
-				console.log("record is null");
-				return;
-			}
-
-			var items = record.split(' ').map(function(item) {
-				return item.trim();
+			/*
+			obj_arr.sort(function(a,b) {
 			});
-			if( items == null || items.length < 7 ) {
-				console.log("items.length < 7");
-				return;
-			}
+			*/
 
-			var cols;
-			
-			// local_address
-			cols = items[1].split(':');
-			if( cols != null ) {
-				obj_tcp.lip   = hexToIP(cols[0]);
-				obj_tcp.lport = parseInt("0x" + cols[1]);
-			}
-
-			// remote_address
-			cols = items[2].split(':');
-			if( cols != null ) {
-				obj_tcp.rip   = hexToIP(cols[0]);
-				obj_tcp.rport = parseInt("0x" + cols[1]);
-			}
-			
-			// status
-			var net_state = {
-				0  : "NONE" ,
-				1  : "ESTABLISHED" ,
-				2  : "SYN_SENT" ,
-				3  : "SYN_RECV" ,
-				4  : "FIN_WAIT1" ,
-				5  : "FIN_WAIT2" ,
-				6  : "TIME_WAIT" ,
-				7  : "CLOSE" ,
-				8  : "CLOSE_WAIT" ,
-				9  : "LAST_ACK" ,
-				10 : "LISTEN" ,
-				11 : "CLOSING" ,
-			};
-			obj_tcp.st = net_state[ parseInt("0x" + items[3]) ];
-
-			// tx,rx
-			cols = items[4].split(':');
-			if( cols != null ) {
-				obj_tcp.tx_queue   = parseInt("0x" + cols[0]);
-				obj_tcp.rx_queue = parseInt("0x" + cols[1]);
-			}
-
-			obj_arr[arrcnt] = obj_tcp;
-			arrcnt++;
+			console.log("<------------------------------ proc_udp");
+			// console.log("net_tcp:" + JSON.stringify(obj_arr));
+			callback(null, obj_arr);
 		});
-
-		// console.log("net_udp:" + JSON.stringify(obj_arr));
-		console.log("<------------------------------ proc_net.net_udp");
-		callback(null, obj_arr);
 	});
 }
 
@@ -400,7 +362,7 @@ module.exports.ipcq = function(callback)
 				return;
 			}
 
-			obj_ipcq.key     = items[0];
+			obj_ipcq.key     = ustd.decToHex(items[0], 8); // "0x" + Number(items[0]).toString(16);
 			obj_ipcq.msqid   = items[1];
 			obj_ipcq.perms   = items[2];
 			obj_ipcq.cbytes  = items[3];
@@ -408,18 +370,17 @@ module.exports.ipcq = function(callback)
 
 			obj_ipcq.lspid   = items[5];
 			obj_ipcq.lrpid   = items[6];
-			obj_ipcq.uid     = items[7];
-			obj_ipcq.gid     = items[8];
+			obj_ipcq.owner   = ustd.getSysUser(items[7]);
 
-			obj_ipcq.stime   = items[9];
-			obj_ipcq.rtime   = items[10];
-			obj_ipcq.ctime   = items[11];
+			obj_ipcq.stime   = ustd.dateFormat(new Date(items[11]*1000), "%Y%m%d%H%M%S", false);
+			obj_ipcq.rtime   = ustd.dateFormat(new Date(items[12]*1000), "%Y%m%d%H%M%S", false);
+			obj_ipcq.ctime   = ustd.dateFormat(new Date(items[13]*1000), "%Y%m%d%H%M%S", false);
 
 			obj_arr[arrcnt] = obj_ipcq;
 			arrcnt++;
 		});
 
-		console.log("ipc-msg=" + JSON.stringify(obj_arr) + "\n");
+		// console.log("ipc-msg=" + JSON.stringify(obj_arr) + "\n");
 		console.log("<------------------------------ ipc-msg\n");
 		callback(null, obj_arr);
 	});
@@ -490,7 +451,7 @@ module.exports.ipcm = function(callback)
 			arrcnt++;
 		});
 
-		console.log("ipc-shm=" + JSON.stringify(obj_arr) + "\n");
+		// console.log("ipc-shm=" + JSON.stringify(obj_arr) + "\n");
 		console.log("<------------------------------ ipc-shm\n");
 		callback(null, obj_arr);
 	});
@@ -554,7 +515,7 @@ module.exports.ipcs = function(callback)
 			arrcnt++;
 		});
 
-		console.log("ipc-sem=" + JSON.stringify(obj_arr) + "\n");
+		// console.log("ipc-sem=" + JSON.stringify(obj_arr) + "\n");
 		console.log("<------------------------------ ipc-sem\n");
 		callback(null, obj_arr);
 	});

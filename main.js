@@ -1,35 +1,16 @@
-var port = 8081;
+var port = 8082;
 // var port = process.env.port || 1337;
 
 var fs = require("fs");
 var http = require('http');
 var async = require('async');
 var url = require('url');
+const cluster = require('cluster');
 
-var sysm = require('./proc_sys');
+var psys = require('./proc_sys');
+var pdat = require('./proc_data');
 var push = require('./proc_push');
-
-function dateFormat (date, fstr, utc) {
-  utc = utc ? 'getUTC' : 'get';
-  return fstr.replace (/%[YmdHMS]/g, function (m) {
-    switch (m) {
-    case '%Y': return date[utc + 'FullYear'] (); // no leading zeros required
-    case '%m': m = 1 + date[utc + 'Month'] (); break;
-    case '%d': m = date[utc + 'Date'] (); break;
-    case '%H': m = date[utc + 'Hours'] (); break;
-    case '%M': m = date[utc + 'Minutes'] (); break;
-    case '%S': m = date[utc + 'Seconds'] (); break;
-    default: return m.slice (1); // unknown code, remove %
-    }
-    // add leading zero if required
-    return ('0' + m).slice (-2);
-  });
-}
-
-function sleep(milliSeconds) {
-	var startTime = new Date().getTime();
-	while (new Date().getTime() < startTime + milliSeconds);
-}
+var ustd = require('./util_std');
 
 function recv_after(req, res)
 {
@@ -86,6 +67,14 @@ function recv_after(req, res)
 			fs.readFile(filename, function(err, data) {
 				// if( err ) throw err;
 				if( err ) { console.log("view_tcp.js error..."); return; }
+				
+				if( filename.indexOf(".html") > 0 ) {
+					res.writeHead(200, {'Content-Type': 'text/html'});
+				} else 
+				if( filename.indexOf(".css") > 0 ) {
+					res.writeHead(200, {'Content-Type': 'text/css'});
+				}
+
 				res.write(data);
 				res.end();
 				
@@ -110,14 +99,15 @@ function recv_after(req, res)
 	    return;
 	} else {
 		var funcs = {
-			info: sysm.info,
-			cpu : sysm.cpu,
-			mem : sysm.mem,
-			tcp : sysm.tcp,
-			udp : sysm.udp,
-			ipcq : sysm.ipcq,
-			ipcm : sysm.ipcm,
-			ipcs : sysm.ipcs,
+			info: psys.info,
+			cpu : psys.cpu,
+			mem : psys.mem,
+			tcp : psys.tcp,
+			udp : psys.udp,
+			ipcq : psys.ipcq,
+			ipcm : psys.ipcm,
+			ipcs : psys.ipcs,
+			amem : pdat.mem,
 		};
 		var names = [];
 		var procs = null;
@@ -163,8 +153,8 @@ function recv_after(req, res)
 					sysinfo[key] = rst;
 				}
 
-				sysinfo["date"] = dateFormat(nowd, "%Y%m%d", false);
-				sysinfo["time"] = dateFormat(nowd, "%H%M%S", false);
+				// sysinfo["date"] = ustd.dateFormat(nowd, "%Y%m%d", false);
+				// sysinfo["time"] = ustd.dateFormat(nowd, "%H%M%S", false);
 			} else {
 				sysinfo = results[0];
 			}
@@ -215,6 +205,46 @@ function server_accepted(req, res)
 	}
 }
 
-var server_main = http.createServer(server_accepted);
-server_main.listen(port);
-console.log("Server running at http://127.0.0.1:8081");
+////////////////////////////////////////////////////////////////////////
+// Clustering...
+if (cluster.isMaster) {
+	console.log(`# Master ${process.pid} is running`);
+
+	// Fork workers.
+	var numCPUs = 1; // require('os').cpus().length;
+	for( var i = 0; i < numCPUs; i++ ) {
+		cluster.fork();
+	}
+
+	cluster.on('online', function(worker) {
+		console.log('# Worker ' + worker.process.pid + ' is online');
+	});
+
+	cluster.on('exit', (worker, code, signal) => {
+		console.log(`# worker ${worker.process.pid} died`);
+	});
+
+	var server_main = http.createServer(server_accepted);
+	server_main.listen(port);
+	console.log("# Server running at http://127.0.0.1:8081");
+
+} else {
+	var pdba = require('./proc_db');
+
+	console.log('# Child ' + process.pid + ' is running');
+
+	psys.mem(pdba.mem_insert);
+	psys.ipcq(pdba.ipcq_insert);
+	psys.tcp(pdba.tcp_insert);
+	psys.udp(pdba.udp_insert);
+
+	setInterval(function() {
+		var nowTime = ustd.dateFormat(new Date(), "%H:%M:%S", false);
+		console.log('# loop : ' + nowTime.toString());
+
+		psys.mem(pdba.mem_insert);
+		psys.ipcq(pdba.ipcq_insert);
+		psys.tcp(pdba.tcp_insert);
+		psys.udp(pdba.udp_insert);
+	}, 60*1000);
+}

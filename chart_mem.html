@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+<!--
+	<link rel="stylesheet" type="text/css" href="./side_menu.css">
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="//cdn.kendostatic.com/2013.1.319/styles/kendo.blueopal.min.css" />
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2017.1.118/js/kendo.all.min.js"></script>
+
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2017.1.223/styles/kendo.common-material.min.css" />
+
+    <script src="https://kendo.cdn.telerik.com/2017.1.223/js/kendo.all.min.js"></script>
+-->
+</head>
+<body>
+<div id="example">
+    <div class="demo-section k-content wide">
+        <div id="chart"></div>
+    </div>
+    <script>
+        function createChart() {
+            $("#chart").kendoChart({
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "./main.js?type=amem",
+                            dataType: "json"
+                        }
+                    },
+                    sort: {
+                        field: "year",
+                        dir: "asc"
+                    }
+                },
+                title: {
+                    text: "Memory Usage"
+                },
+                legend: {
+                    position: "top"
+                },
+                seriesDefaults: {
+                    type: "line",
+                    missingValues: "gap",
+                },
+                series: [{
+                    field: "total",
+                    name: "Total"
+                }, {
+                    field: "free",
+                    name: "Free"
+                }, {
+                    field: "swap",
+                    name: "swap"
+                }],
+                categoryAxis: {
+                    field: "itime",
+                    labels: {
+                        rotation: 0,
+                        step: 6,
+                    },
+                    crosshair: {
+                        visible: true
+                    }
+                },
+                valueAxis: {
+                    labels: {
+                        format: "N0",
+                    },
+                    majorUnit: 1000
+                },
+                tooltip: {
+                    visible: true,
+                    format: "{0}M"
+                }
+            });
+        }
+
+        $(document).ready(createChart);
+        $(document).bind("kendo:skinChange", createChart);
+    </script>
+</div>
+
+
+</body>
+</html>
